@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Lua.Scripting.Abstraction;
 
-public interface ILuaScriptProvider : ILuaScriptLoader, ILuaScriptUnloader, IDisposable
+public interface ILuaScriptProvider : ILuaScriptLoader, ILuaScriptUnloader, IAsyncDisposable
 {
     IEnumerable<ILuaScript> Scripts { get; }
 

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Lua.Scripting.Abstraction;
 
-public interface ILuaScript : ILuaStringExecutor
+public interface ILuaScript : ILuaStringExecutor, ILuaValueCaller
 {
     string Name { get; }
 
@@ -16,13 +16,13 @@ public interface ILuaScript : ILuaStringExecutor
 
     LuaValue GetValue(LuaValue name);
 
+    ValueTask<LuaValue[]> CallAsync(LuaValue name, ReadOnlySpan<LuaValue> arguments, CancellationToken cancellationToken = default);
+
     void SetValue(LuaValue name, LuaValue value);
 
     void RemoveValue(LuaValue name);
 
     void Clear();
-
-    ValueTask<LuaValue[]> CallAsync(LuaValue name, ReadOnlySpan<LuaValue> arguments, CancellationToken cancellationToken = default);
 
     ValueTask<LuaValue[]> ReloadAsync(CancellationToken cancellationToken = default);
 }

@@ -5,5 +5,5 @@ namespace Lua.Scripting.Abstraction;
 
 public interface ILuaStringExecutor
 {
-    ValueTask<LuaValue[]> Execute(string code, CancellationToken cancellationToken = default);
+    ValueTask<LuaValue[]> ExecuteAsync(string code, CancellationToken cancellationToken = default);
 }

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Lua.Scripting;
 
-public sealed class LuaScriptProvider(LuaPlatform? platform = null) : ILuaScriptProvider, ILuaStringExecutor
+public sealed class LuaScriptProvider(LuaPlatform? platform = null) : ILuaScriptProvider, ILuaStringExecutor, ILuaValueCaller
 {
     private const LuaScriptMetaData.ECreationFlags MEMORY_SCRIPT_CREATION_FLAGS = LuaScriptMetaData.ECreationFlags.Memory | LuaScriptMetaData.ECreationFlags.CSharp;
     private const LuaScriptMetaData.ECreationFlags FILE_SCRIPT_CREATION_FLAGS = LuaScriptMetaData.ECreationFlags.File | LuaScriptMetaData.ECreationFlags.CSharp;
@@ -19,16 +19,16 @@ public sealed class LuaScriptProvider(LuaPlatform? platform = null) : ILuaScript
 
     public IEnumerable<ILuaScript> Scripts => m_ScriptsBridges;
 
-    public ILuaScript? Get(string name) => m_ScriptsBridges.Find(s => s.Name == name);
-
     public bool Has(string name) => m_ScriptsBridges.FindIndex(s => s.Name == name) is not -1;
+
+    public ILuaScript? Get(string name) => m_ScriptsBridges.Find(s => s.Name == name);
 
     public ValueTask<ILuaScript> LoadAsync(string code, string name, CancellationToken cancellationToken = default)
     {
         var state = m_State;
         LuaTable env = [];
         LuaScript script = new(state, state.Load(code.AsSpan(), name, env), env, new(name, nameof(LuaScriptProvider), MEMORY_SCRIPT_CREATION_FLAGS));
-        return new(InternalRegisterBridge(script, cancellationToken));
+        return new(InternalRegisterScriptAsync(script, cancellationToken));
     }
 
     public async ValueTask<ILuaScript> LoadFromAsync(string path, CancellationToken cancellationToken = default)
@@ -36,7 +36,7 @@ public sealed class LuaScriptProvider(LuaPlatform? platform = null) : ILuaScript
         var state = m_State;
         LuaTable env = [];
         LuaScript script = new(state, await state.LoadFileAsync(path, string.Empty, env, cancellationToken), env, new(Path.GetFileNameWithoutExtension(path), path, FILE_SCRIPT_CREATION_FLAGS));
-        return await InternalRegisterBridge(script, cancellationToken);
+        return await InternalRegisterScriptAsync(script, cancellationToken);
     }
 
     public ValueTask UnloadAsync(string name, CancellationToken cancellationToken = default)
@@ -49,17 +49,21 @@ public sealed class LuaScriptProvider(LuaPlatform? platform = null) : ILuaScript
         return default;
     }
 
-    public void Dispose()
+    public ValueTask<LuaValue[]> ExecuteAsync(string code, CancellationToken cancellationToken = default) => m_State.ExecuteAsync(m_State.Load(code.AsSpan(), "dynamic", m_State.Environment), cancellationToken);
+
+    public ValueTask<LuaValue[]> CallValueAsync(LuaValue value, ReadOnlySpan<LuaValue> arguments, CancellationToken cancellationToken = default) => m_State.CallAsync(value, arguments, cancellationToken);
+
+    public ValueTask DisposeAsync()
     {
+        // TODO: Event.
         m_State.Dispose();
+        return default;
     }
 
-    private async Task<ILuaScript> InternalRegisterBridge(ILuaScript bridge, CancellationToken cancellationToken = default)
+    private async Task<ILuaScript> InternalRegisterScriptAsync(ILuaScript bridge, CancellationToken cancellationToken = default)
     {
         // TODO: Async event.
         m_ScriptsBridges.Add(bridge);
         return bridge;
     }
-
-    public ValueTask<LuaValue[]> Execute(string code, CancellationToken cancellationToken = default) => m_State.ExecuteAsync(m_State.Load(code.AsSpan(), "dynamic", m_State.Environment), cancellationToken);
 }
