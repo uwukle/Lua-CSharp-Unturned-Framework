@@ -26,10 +26,10 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<MDT Condition="'$(MDT)' == ''">CLIENT</MDT>
+		<MDT Condition="'$(MDT)' == ''">SHARED</MDT>
 		<DefineConstants Condition="'$(MDT)' == 'SERVER'">$(DefineConstants);SERVER</DefineConstants>
 		<DefineConstants Condition="'$(MDT)' == 'CLIENT'">$(DefineConstants);CLIENT</DefineConstants>
-		<DefineConstants Condition="'$(MDT)' == 'SHARED'">$(DefineConstants);SHARED</DefineConstants>
+		<DefineConstants Condition="'$(MDT)' == 'SHARED'">$(DefineConstants);CLIENT;SERVER;SHARED</DefineConstants>
 	</PropertyGroup>
 
 </Project>
