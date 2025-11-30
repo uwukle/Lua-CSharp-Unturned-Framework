@@ -26,10 +26,15 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<MDT Condition="'$(MDT)' == ''">SHARED</MDT>
+		<!-- Server/Client module selection. -->
+		<MDT Condition="'$(MDT)' == ''">CLIENT</MDT>
 		<DefineConstants Condition="'$(MDT)' == 'SERVER'">$(DefineConstants);SERVER</DefineConstants>
 		<DefineConstants Condition="'$(MDT)' == 'CLIENT'">$(DefineConstants);CLIENT</DefineConstants>
-		<DefineConstants Condition="'$(MDT)' == 'SHARED'">$(DefineConstants);CLIENT;SERVER;SHARED</DefineConstants>
+
+		<!-- Branch selection. -->
+		<Branch Condition="'$(Branch)' == ''">STABLE</Branch>
+		<DefineConstants Condition="'$(Branch)' == 'PREVIEW'">$(DefineConstants);PREVIEW</DefineConstants>
+		<DefineConstants Condition="'$(Branch)' == 'STABLE'">$(DefineConstants);STABLE</DefineConstants>
 	</PropertyGroup>
 
 </Project>

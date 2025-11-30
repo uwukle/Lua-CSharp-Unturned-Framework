@@ -1,7 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-	
+
 	<ItemGroup>
 		<ProjectReference Include="..\Lua.Unity\Lua.Unity.csproj" />
 	</ItemGroup>
-	
+
+	<ItemGroup>
+		<!-- Server Preview -->
+		<PackageReference Include="RocketModFix.Unturned.Redist.Server-Preview" Version="3.25.10.107" Condition="'$(MDT)' == 'SERVER' And '$(Branch)' == 'PREVIEW'" />
+
+		<!-- Server Stable -->
+		<PackageReference Include="RocketModFix.Unturned.Redist.Server" Version="3.25.9.2" Condition="'$(MDT)' == 'SERVER' And '$(Branch)' == 'STABLE'" />
+
+		<!-- Client Preview -->
+		<PackageReference Include="RocketModFix.Unturned.Redist.Client-Preview" Version="3.25.10.107" Condition="'$(MDT)' == 'CLIENT' And '$(Branch)' == 'PREVIEW'" />
+
+		<!-- Client Stable -->
+		<PackageReference Include="RocketModFix.Unturned.Redist.Client" Version="3.25.9.2" Condition="'$(MDT)' == 'CLIENT' And '$(Branch)' == 'STABLE'" />
+	</ItemGroup>
+
 </Project>
