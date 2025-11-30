@@ -27,9 +27,9 @@
 
 	<PropertyGroup>
 		<!-- Server/Client module -->
-		<MDT Condition="'$(MDT)' == ''">CLIENT</MDT>
-		<DefineConstants Condition="'$(MDT)' == 'SERVER'">$(DefineConstants);SERVER</DefineConstants>
-		<DefineConstants Condition="'$(MDT)' == 'CLIENT'">$(DefineConstants);CLIENT</DefineConstants>
+		<Role Condition="'$(Role)' == ''">CLIENT</Role>
+		<DefineConstants Condition="'$(Role)' == 'SERVER'">$(DefineConstants);SERVER</DefineConstants>
+		<DefineConstants Condition="'$(Role)' == 'CLIENT'">$(DefineConstants);CLIENT</DefineConstants>
 
 		<!-- Branch -->
 		<Branch Condition="'$(Branch)' == ''">STABLE</Branch>
