@@ -9,10 +9,6 @@
 		<BaseOutputPath>$(MSBuildThisFileDirectory)bin\</BaseOutputPath>
 	</PropertyGroup>
 
-	<PropertyGroup>
-		<Configurations>ClientDebug;ServerDebug;ServerRelease;ClientRelease</Configurations>
-	</PropertyGroup>
-
 	<PropertyGroup Condition="$(Configuration.Contains('Debug'))">
 		<Optimize>false</Optimize>
 		<DebugType>full</DebugType>
@@ -22,11 +18,18 @@
 
 	<PropertyGroup Condition="$(Configuration.Contains('Release'))">
 		<ProduceReferenceAssembly>True</ProduceReferenceAssembly>
-		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<!-- GenerateDocumentationFile>True</GenerateDocumentationFile -->
 		<ProduceReferenceAssemblyInOutDir>True</ProduceReferenceAssemblyInOutDir>
 		<WarningLevel>9999</WarningLevel>
 		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
 		<DefineConstants>RELEASE</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<MDT Condition="'$(MDT)' == ''">CLIENT</MDT>
+		<DefineConstants Condition="'$(MDT)' == 'SERVER'">$(DefineConstants);SERVER</DefineConstants>
+		<DefineConstants Condition="'$(MDT)' == 'CLIENT'">$(DefineConstants);CLIENT</DefineConstants>
+		<DefineConstants Condition="'$(MDT)' == 'SHARED'">$(DefineConstants);SHARED</DefineConstants>
 	</PropertyGroup>
 
 </Project>
