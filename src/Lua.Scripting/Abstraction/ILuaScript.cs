@@ -1,0 +1,28 @@
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace Lua.Scripting.Abstraction;
+
+public interface ILuaScript : ILuaStringExecutor
+{
+    string Name { get; }
+
+    LuaScriptMetaData MetaData { get; }
+
+    ValueTask<LuaValue[]> ExecuteAsync(CancellationToken cancellationToken = default);
+
+    bool TryGetValue(LuaValue name, out LuaValue value);
+
+    LuaValue GetValue(LuaValue name);
+
+    void SetValue(LuaValue name, LuaValue value);
+
+    void RemoveValue(LuaValue name);
+
+    void Clear();
+
+    ValueTask<LuaValue[]> CallAsync(LuaValue name, ReadOnlySpan<LuaValue> arguments, CancellationToken cancellationToken = default);
+
+    ValueTask<LuaValue[]> ReloadAsync(CancellationToken cancellationToken = default);
+}
