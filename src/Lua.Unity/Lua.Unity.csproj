@@ -1,0 +1,11 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	
+	<ItemGroup>
+		<PackageReference Include="RocketModFix.UnityEngine.Redist" Version="2021.3.29.1" />
+	</ItemGroup>
+	
+	<ItemGroup>
+		<ProjectReference Include="..\Lua.Scripting\Lua.Scripting.csproj" />
+	</ItemGroup>
+	
+</Project>

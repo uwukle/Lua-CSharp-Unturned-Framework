@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<ItemGroup>
+		<ProjectReference Include="..\Lua.Scripting\Lua.Scripting.csproj" />
+		<ProjectReference Include="..\Lua.Unity\Lua.Unity.csproj" />
+		<ProjectReference Include="..\Lua.Unturned.Module\Lua.Unturned.Module.csproj" />
+		<ProjectReference Include="..\Lua.Unturned\Lua.Unturned.csproj" />
+	</ItemGroup>
+
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<ItemGroup>
+			<ProjectReferenceAssemblies Include="%(ProjectReference.Filename).dll" />
+		</ItemGroup>
+		<Exec Command="ilrepack /out:0StandaloneBuild\0$(TargetFileName) $(TargetFileName) @(ProjectReferenceAssemblies, ' ')" WorkingDirectory="$(OutputPath)" />
+	</Target>
+
+</Project>
