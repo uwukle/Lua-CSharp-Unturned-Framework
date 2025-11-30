@@ -26,7 +26,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<!-- Server/Client module -->
+		<!-- Role -->
 		<Role Condition="'$(Role)' == ''">CLIENT</Role>
 		<DefineConstants Condition="'$(Role)' == 'SERVER'">$(DefineConstants);SERVER</DefineConstants>
 		<DefineConstants Condition="'$(Role)' == 'CLIENT'">$(DefineConstants);CLIENT</DefineConstants>
