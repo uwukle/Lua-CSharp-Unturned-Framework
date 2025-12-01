@@ -140,21 +140,7 @@ public sealed class Nexus : IModuleNexus
         foreach (var scriptPath in Directory.GetFiles(LUA_STARTUP_DIRECTORY, "*.lua", SearchOption.TopDirectoryOnly))
         {
             cancellationToken.ThrowIfCancellationRequested();
-
-            try
-            {
-                var script = await provider.LoadFromAsync(scriptPath, cancellationToken);
-                var loadOutput = await script.ExecuteAsync();
-
-                logger.LogInfoFormat("Lua script {0} loaded successfully.", scriptPath);
-                logger.LogInfoFormat("Lua script {0} Output:\n{1}", scriptPath, string.Join("\n", loadOutput));
-
-                await mediator.OnScriptLoadedAsync(script, loadOutput, cancellationToken);
-            }
-            catch (Exception e)
-            {
-                logger.LogFatalFormat("An unexpected error occurred while loading the Lua script {0}.", e, scriptPath);
-            }
+            await provider.TryLoadFromAndExecuteWithLoggingAsync(scriptPath, logger, cancellationToken);
         }
     }
 

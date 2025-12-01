@@ -21,8 +21,6 @@ public interface ILuaPlugin
 
     IEnumerable<ILuaModuleLoader> Loaders { get; }
 
-    IEnumerable<LuaRequiredScript> RequiredScripts { get; }
-
     ValueTask LoadAsync(CancellationToken cancellationToken = default);
 
     ValueTask UnloadAsync(CancellationToken cancellationToken = default);
