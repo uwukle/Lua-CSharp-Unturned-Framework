@@ -1,4 +1,5 @@
-﻿using Lua.Scripting.Abstraction;
+﻿using Lua.Plugins.Abstraction;
+using Lua.Scripting.Abstraction;
 using Lua.Scripting.Logging.Abstraction;
 using Lua.Scripting.Mediator.Abstraction;
 using System;
@@ -6,7 +7,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Lua.Plugins.Abstraction;
+namespace Lua.Plugins;
 
 public abstract class LuaPlugin : ILuaPlugin, ILuaInjectable
 {
