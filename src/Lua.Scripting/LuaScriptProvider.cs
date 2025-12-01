@@ -8,13 +8,21 @@ using System.Threading.Tasks;
 
 namespace Lua.Scripting;
 
-public sealed class LuaScriptProvider(LuaPlatform? platform = null) : ILuaScriptProvider, ILuaStringExecutor, ILuaValueCaller
+public sealed class LuaScriptProvider : ILuaScriptProvider, ILuaStringExecutor, ILuaValueCaller, ILuaModuleLoaderProvider
 {
     private const LuaScriptMetaData.ECreationFlags MEMORY_SCRIPT_CREATION_FLAGS = LuaScriptMetaData.ECreationFlags.Memory | LuaScriptMetaData.ECreationFlags.CSharp;
     private const LuaScriptMetaData.ECreationFlags FILE_SCRIPT_CREATION_FLAGS = LuaScriptMetaData.ECreationFlags.File | LuaScriptMetaData.ECreationFlags.CSharp;
 
-    private readonly LuaState m_State = platform is null ? LuaState.Create() : LuaState.Create(platform);
+    private readonly LuaState m_State;
+    private readonly LuaDynamicModuleLoader m_ModuleLoader;
     private readonly List<ILuaScript> m_Scripts = [];
+
+    public LuaScriptProvider(LuaPlatform? platform = null)
+    {
+        m_State = platform is null ? LuaState.Create() : LuaState.Create(platform);
+        m_ModuleLoader = new LuaDynamicModuleLoader();
+        m_State.ModuleLoader = m_ModuleLoader;
+    }
 
     public IEnumerable<ILuaScript> Scripts => m_Scripts;
 
@@ -69,12 +77,16 @@ public sealed class LuaScriptProvider(LuaPlatform? platform = null) : ILuaScript
         return default;
     }
 
-    private async Task<ILuaScript> InternalRegisterScriptAsync(ILuaScript bridge, CancellationToken cancellationToken = default)
+    private async Task<ILuaScript> InternalRegisterScriptAsync(ILuaScript script, CancellationToken cancellationToken = default)
     {
         // TODO: Async event.
-        m_Scripts.Add(bridge);
-        return bridge;
+        m_Scripts.Add(script);
+        return script;
     }
 
     public ILuaScript? GetBySource(string source) => m_Scripts.Find(s => s.MetaData.Source == source);
+
+    public void Register(ILuaModuleLoader loader) => m_ModuleLoader.Register(loader);
+
+    public void Unregister(ILuaModuleLoader loader) => m_ModuleLoader.Unregister(loader);
 }
