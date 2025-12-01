@@ -3,6 +3,7 @@ using Lua.Plugins.Tools;
 using Lua.Scripting.Abstraction;
 using Lua.Scripting.Logging.Abstraction;
 using Lua.Scripting.Mediator.Abstraction;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Lua.Plugins;
 
-public sealed class LuaPluginProvider(ILuaScriptProvider scriptProvider, ILuaModuleLoaderProvider moduleLoaderProvider, ILuaLogger logger, ILuaMediator mediator) : ILuaPluginProvider
+public sealed class LuaPluginProvider(ILuaScriptProvider scriptProvider, ILuaModuleLoaderProvider moduleLoaderProvider, ILuaLogger logger, ILuaMediator mediator) : ILuaPluginProvider, IAsyncDisposable
 {
     private readonly ILuaScriptProvider m_ScriptProvider = scriptProvider;
     private readonly ILuaModuleLoaderProvider m_ModuleLoaderProvider = moduleLoaderProvider;
@@ -50,4 +51,9 @@ public sealed class LuaPluginProvider(ILuaScriptProvider scriptProvider, ILuaMod
     public ValueTask LoadAsync(string name, CancellationToken cancellationToken = default) => Get(name)?.LoadAsync(cancellationToken) ?? default;
 
     public ValueTask UnloadAsync(string name, CancellationToken cancellationToken = default) => Get(name)?.UnloadAsync(cancellationToken) ?? default;
+
+    public async ValueTask DisposeAsync()
+    {
+        foreach (var plugin in m_Plugins) await plugin.UnloadAsync();
+    }
 }

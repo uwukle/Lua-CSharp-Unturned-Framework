@@ -101,7 +101,7 @@ public sealed class Nexus : IModuleNexus
 
         m_DirectoryBinder.Bind();
 
-        Task.Run(() => LoadNexusAsync(m_CancellationTokenSource.Token));
+        Task.Run(() => LoadAsync(m_CancellationTokenSource.Token));
     }
 
     void IModuleNexus.shutdown()
@@ -112,14 +112,20 @@ public sealed class Nexus : IModuleNexus
         m_DirectoryBinder.Dispose();
 
         m_CancellationTokenSource.Cancel();
-        Task.Run(m_ScriptProvider.DisposeAsync);
+        Task.Run(UnloadAsync);
     }
 
-    private async Task LoadNexusAsync(CancellationToken cancellationToken = default)
+    private async Task LoadAsync(CancellationToken cancellationToken = default)
     {
-        await LoadPluginsAsync(cancellationToken);
+        await LoadDefaultPluginsAsync(cancellationToken);
         await LoadDefaultScriptsAsync(cancellationToken);
         await m_Mediator.OnNexusLoadedAsync(cancellationToken);
+    }
+
+    private async Task UnloadAsync()
+    {
+        await m_ScriptProvider.DisposeAsync();
+        await m_PluginProvider.DisposeAsync();
     }
 
     private async Task LoadDefaultScriptsAsync(CancellationToken cancellationToken = default)
@@ -152,7 +158,7 @@ public sealed class Nexus : IModuleNexus
         }
     }
 
-    private async Task LoadPluginsAsync(CancellationToken cancellationToken = default)
+    private async Task LoadDefaultPluginsAsync(CancellationToken cancellationToken = default)
     {
         var logger = m_Logger;
         var provider = m_PluginProvider;
