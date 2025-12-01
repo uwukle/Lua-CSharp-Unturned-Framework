@@ -132,7 +132,6 @@ public sealed class Nexus : IModuleNexus
     {
         var logger = m_Logger;
         var provider = m_ScriptProvider;
-        var mediator = m_Mediator;
 
         Directory.CreateDirectoryIfNeeded(LUA_STARTUP_DIRECTORY);
 
