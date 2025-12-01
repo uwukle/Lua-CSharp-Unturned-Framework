@@ -11,12 +11,13 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Lua.Unturned.Module.Extensions;
+using Lua.Scripting.Logging.Abstraction;
 
 namespace Lua.Unturned.Module;
 
 public class Nexus : IModuleNexus
 {
-    private sealed class DirectoryBinder(string bindDirectory)
+    private sealed class DirectoryBinder(string bindDirectory) : IDisposable
     {
         private readonly string m_BindDirectory = bindDirectory;
         private string? m_OriginalDirectory;
@@ -27,14 +28,20 @@ public class Nexus : IModuleNexus
 
         internal void Bind()
         {
+            if (IsBinded) return;
+
             m_OriginalDirectory = Directory.GetCurrentDirectory();
+
             if (SetDirectory(m_BindDirectory)) return;
+
             IsBinded = true;
         }
 
         public void Unbind()
         {
+            if (!IsBinded) return;
             if (!SetDirectory(m_OriginalDirectory)) return;
+
             IsBinded = false;
         }
 
@@ -47,6 +54,8 @@ public class Nexus : IModuleNexus
 
             return true;
         }
+
+        public void Dispose() => Unbind();
     }
 
     private const string LUA_STARTUP_DIRECTORY = "Startup";
@@ -72,6 +81,8 @@ public class Nexus : IModuleNexus
 
     public ILuaMediator Mediator => m_Mediator;
 
+    public ILuaLogger Logger => m_Logger;
+
     void IModuleNexus.initialize()
     {
         if (m_Instance is not null) throw new InvalidOperationException($"It is not possible to initialize more than one {nameof(Nexus)} instance.");
@@ -86,7 +97,7 @@ public class Nexus : IModuleNexus
     void IModuleNexus.shutdown()
     {
         m_Instance = null;
-        m_DirectoryBinder.Unbind();
+        m_DirectoryBinder.Dispose();
 
         m_CancellationTokenSource.Cancel();
         Task.Run(() => m_Provider.DisposeAsync(m_CancellationTokenSource.Token));
