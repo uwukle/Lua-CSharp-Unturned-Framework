@@ -19,5 +19,7 @@ public static class MediatorExtensions
         return mediator.NotifyAsync("OnScriptLoaded", argumentsSpan, cancellationToken);
     }
 
+    public static ValueTask OnLoadedAsync(this ILuaMediator mediator, LuaValue[] loadOutput, CancellationToken cancellationToken = default) => mediator.NotifyAsync("OnLoaded", loadOutput, cancellationToken);
+
     public static ValueTask OnNexusLoadedAsync(this ILuaMediator mediator, CancellationToken cancellationToken = default) => mediator.NotifyAsync("OnNexusLoaded", [], cancellationToken);
 }

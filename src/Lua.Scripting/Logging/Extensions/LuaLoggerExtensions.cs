@@ -5,9 +5,9 @@ namespace Lua.Scripting.Logging.Extensions;
 
 public static class LuaLoggerExtensions
 {
-    public static void LogFatalFormat(this ILuaLogger logger, string message, Exception exception, params object[] arguments) => logger.LogFormat($"{message} -> {exception.Message}", ILuaLogger.ELevel.Fatal, arguments);
+    public static void LogFatalFormat(this ILuaLogger logger, string message, Exception exception, params object[] arguments) => logger.LogFormat(GetFatalMessage(message, exception), ILuaLogger.ELevel.Fatal, arguments);
 
-    public static void LogFatal(this ILuaLogger logger, string message, Exception exception) => logger.Log($"{message} -> {exception.Message}", ILuaLogger.ELevel.Fatal);
+    public static void LogFatal(this ILuaLogger logger, string message, Exception exception) => logger.Log(GetFatalMessage(message, exception), ILuaLogger.ELevel.Fatal);
 
     public static void LogFatalFormat(this ILuaLogger logger, Exception exception, params object[] arguments) => logger.LogFormat(exception.Message, ILuaLogger.ELevel.Fatal, arguments);
 
@@ -24,4 +24,6 @@ public static class LuaLoggerExtensions
     public static void LogMessageFormat(this ILuaLogger logger, string message, params object[] arguments) => logger.LogFormat(message, ILuaLogger.ELevel.Message, arguments);
 
     public static void LogMessage(this ILuaLogger logger, string message) => logger.Log(message, ILuaLogger.ELevel.Message);
+
+    private static string GetFatalMessage(string message, Exception exception) => $"{message} -> {exception.GetType().FullName}: {exception.Message} at {exception.StackTrace}";
 }

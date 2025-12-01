@@ -61,7 +61,7 @@ public sealed class Nexus : IModuleNexus
     private const string LUA_STARTUP_DIRECTORY = "Startup";
 
     private static Nexus? m_Instance;
-    private readonly CancellationTokenSource m_CancellationTokenSource = new();
+    private readonly CancellationTokenSource m_CancellationTokenSource;
     private readonly LuaScriptProvider m_Provider;
     private readonly LuaMediator m_Mediator;
     private readonly LuaUnturnedLogger m_Logger;
@@ -70,8 +70,9 @@ public sealed class Nexus : IModuleNexus
     public Nexus()
     {
         m_Provider = new(LuaUnturnedPlatform.Default);
-        m_Mediator = new(m_Provider);
         m_Logger = new();
+        m_CancellationTokenSource = new();
+        m_Mediator = new(m_Logger, m_Provider);
         m_DirectoryBinder = new(Path.Combine("Servers", Dedicator.serverID, "Lua"));
     }
 
@@ -88,19 +89,21 @@ public sealed class Nexus : IModuleNexus
         if (m_Instance is not null) throw new InvalidOperationException($"It is not possible to initialize more than one {nameof(Nexus)} instance.");
 
         m_Instance = this;
+
         m_DirectoryBinder.Bind();
 
-        m_CancellationTokenSource.Cancel();
         Task.Run(() => LoadDefaultScriptsAsync(m_CancellationTokenSource.Token));
     }
 
     void IModuleNexus.shutdown()
     {
+        if (m_Instance is null) throw new InvalidOperationException($"It is not possible to shutdown {nameof(Nexus)} instance without initialize.");
+
         m_Instance = null;
         m_DirectoryBinder.Dispose();
 
         m_CancellationTokenSource.Cancel();
-        Task.Run(() => m_Provider.DisposeAsync(m_CancellationTokenSource.Token));
+        Task.Run(m_Provider.DisposeAsync);
     }
 
     private async Task LoadDefaultScriptsAsync(CancellationToken cancellationToken = default)
@@ -113,6 +116,8 @@ public sealed class Nexus : IModuleNexus
 
         foreach (var scriptPath in Directory.GetFiles(LUA_STARTUP_DIRECTORY, "*.lua", SearchOption.TopDirectoryOnly))
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             try
             {
                 var script = await provider.LoadFromAsync(scriptPath, cancellationToken);
@@ -121,6 +126,7 @@ public sealed class Nexus : IModuleNexus
                 logger.LogInfoFormat("Lua script {0} loaded successfully.", scriptPath);
                 logger.LogInfoFormat("Lua script {0} Output:\n{1}", scriptPath, string.Join("\n", loadOutput));
 
+                await mediator.OnLoadedAsync(loadOutput, cancellationToken);
                 await mediator.OnScriptLoadedAsync(script, loadOutput, cancellationToken);
             }
             catch (Exception e)

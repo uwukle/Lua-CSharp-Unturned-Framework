@@ -62,14 +62,12 @@ public sealed class LuaScriptProvider(LuaPlatform? platform = null) : ILuaScript
 
     public ValueTask<LuaValue[]> CallValueAsync(LuaValue value, ReadOnlySpan<LuaValue> arguments, CancellationToken cancellationToken = default) => m_State.CallAsync(value, arguments, cancellationToken);
 
-    public ValueTask DisposeAsync(CancellationToken cancellationToken = default)
+    public ValueTask DisposeAsync()
     {
         // TODO: Async event.
         m_State.Dispose();
         return default;
     }
-
-    public ValueTask DisposeAsync() => DisposeAsync(default);
 
     private async Task<ILuaScript> InternalRegisterScriptAsync(ILuaScript bridge, CancellationToken cancellationToken = default)
     {
