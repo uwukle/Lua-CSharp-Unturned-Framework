@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace Lua.Unturned.Module.Extensions;
+namespace Lua.Plugins.Extensions;
 
 public static class DirectoryExtensions
 {

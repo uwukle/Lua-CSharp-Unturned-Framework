@@ -1,4 +1,5 @@
 ﻿using Lua.Plugins.Abstraction;
+using Lua.Plugins.Extensions;
 using Lua.Scripting.Abstraction;
 using Lua.Scripting.Logging.Abstraction;
 using Lua.Scripting.Mediator.Abstraction;
@@ -12,7 +13,11 @@ namespace Lua.Plugins;
 
 public abstract class LuaPlugin : ILuaPlugin, ILuaInjectable
 {
+    private const string LOCAL_SCRIPTS_PATH = "Scripts";
+
     public virtual string Name => GetType().Name;
+
+    public string LocalPath => Path.Combine(LOCAL_SCRIPTS_PATH, Name);
 
 #nullable disable
 
@@ -60,6 +65,9 @@ public abstract class LuaPlugin : ILuaPlugin, ILuaInjectable
     {
         var scriptProvider = ScriptProvider;
         var requiredScripts = RequiredScripts;
+        var localPath = LocalPath;
+
+        Directory.CreateDirectoryIfNeeded(localPath);
 
         foreach (var requiredScript in requiredScripts)
         {
@@ -71,13 +79,14 @@ public abstract class LuaPlugin : ILuaPlugin, ILuaInjectable
                     script = await scriptProvider.LoadAsync(source, name, cancellationToken);
                     break;
                 case var f when f.HasFlag(LuaRequiredScript.EFlags.LoadFromFile):
-                    if (!File.Exists(source))
+                    string scriptPath = Path.Combine(localPath, source);
+                    if (!File.Exists(scriptPath))
                     {
-                        if (f.HasFlag(LuaRequiredScript.EFlags.ThrowIfNotFound)) throw new FileNotFoundException("Required script source not found.", source);
+                        if (f.HasFlag(LuaRequiredScript.EFlags.ThrowIfNotFound)) throw new FileNotFoundException($"Required script source not found. Full path: {scriptPath}", source);
                         continue;
                     }
 
-                    script = await scriptProvider.LoadFromAsync(source, name, cancellationToken);
+                    script = await scriptProvider.LoadFromAsync(scriptPath, name, cancellationToken);
                     break;
                 default:
                     throw new InvalidOperationException($"Load a script of unknown source \"{source}\"({flags}) is not possible.");
