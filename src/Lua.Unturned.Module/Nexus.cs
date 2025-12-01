@@ -6,10 +6,12 @@ using Lua.Scripting.Logging.Abstraction;
 using Lua.Scripting.Logging.Extensions;
 using Lua.Scripting.Mediator;
 using Lua.Scripting.Mediator.Abstraction;
+using Lua.Unturned.Module.Commands;
 using Lua.Unturned.Module.Extensions;
 using SDG.Framework.Modules;
 using SDG.Unturned;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -38,7 +40,7 @@ public sealed class Nexus : IModuleNexus
             IsBinded = true;
         }
 
-        public void Unbind()
+        internal void Unbind()
         {
             if (!IsBinded) return;
             if (!SetDirectory(m_OriginalDirectory)) return;
@@ -59,6 +61,21 @@ public sealed class Nexus : IModuleNexus
         public void Dispose() => Unbind();
     }
 
+    private sealed class CommandsBinder : IDisposable
+    {
+        private readonly List<Command> m_Commands = [];
+
+        internal void Bind(Command command)
+        {
+            m_Commands.Add(command);
+            Commander.register(command);
+        }
+
+        internal void Unbind() => m_Commands.ForEach(c => Commander.deregister(c));
+
+        public void Dispose() => Unbind();
+    }
+
     private const string LUA_STARTUP_DIRECTORY = "Startup";
     private const string LUA_PLUGINS_DIRECTORY = "Plugins";
 
@@ -72,6 +89,7 @@ public sealed class Nexus : IModuleNexus
     private readonly LuaPluginProvider m_PluginProvider;
 
     private readonly DirectoryBinder m_DirectoryBinder;
+    private readonly CommandsBinder m_CommandBinder;
 
     public Nexus()
     {
@@ -83,6 +101,7 @@ public sealed class Nexus : IModuleNexus
         m_PluginProvider = new(m_ScriptProvider, m_ScriptProvider, m_Logger, m_Mediator);
 
         m_DirectoryBinder = new(Path.Combine("Servers", Dedicator.serverID, "Lua"));
+        m_CommandBinder = new();
     }
 
     public static Nexus Instance => m_Instance ?? throw new NullReferenceException($"Not a single instance of the {nameof(Nexus)} was ever initialized.");
@@ -100,6 +119,7 @@ public sealed class Nexus : IModuleNexus
         m_Instance = this;
 
         m_DirectoryBinder.Bind();
+        RegisterCommands();
 
         Task.Run(() => LoadAsync(m_CancellationTokenSource.Token));
     }
@@ -109,7 +129,9 @@ public sealed class Nexus : IModuleNexus
         if (m_Instance is null) throw new InvalidOperationException($"It is not possible to shutdown {nameof(Nexus)} instance without initialize.");
 
         m_Instance = null;
+
         m_DirectoryBinder.Dispose();
+        m_CommandBinder.Dispose();
 
         m_CancellationTokenSource.Cancel();
         Task.Run(UnloadAsync);
@@ -163,5 +185,11 @@ public sealed class Nexus : IModuleNexus
                 logger.LogFatalFormat("An unexpected error occurred while loading the plugins dll {0}.", e, pluginPath);
             }
         }
+    }
+
+    private void RegisterCommands()
+    {
+        var binder = m_CommandBinder;
+        binder.Bind(new LuaRunCommand(m_ScriptProvider, m_Logger));
     }
 }

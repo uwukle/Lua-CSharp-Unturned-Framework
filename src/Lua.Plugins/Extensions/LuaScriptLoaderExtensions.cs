@@ -18,7 +18,7 @@ public static class LuaScriptLoaderExtensions
             var loadOutput = await script.ExecuteAsync();
 
             logger.LogInfoFormat("Lua script {0} loaded successfully.", path);
-            if(loadOutput is { Length: > 0 }) logger.LogInfoFormat("Lua script {0} Output:\n{1}", path, string.Join("\n", loadOutput));
+            if (loadOutput is { Length: > 0 }) logger.LogInfoFormat("Lua script {0} Output:\n{1}", path, string.Join("\n", loadOutput));
         }
         catch (Exception e)
         {
