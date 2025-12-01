@@ -31,12 +31,12 @@ public sealed class LuaRunCommand : Command
     {
         var logger = m_Logger;
 
-        logger.LogInfoFormat("{0} execute script {1}", executorId.m_SteamID, parameter);
+        logger.LogInfoFormat("{0} execute script: {\n{1} \n}", executorId.m_SteamID, parameter);
 
         try
         {
             var executeOutput = await m_Executer.ExecuteAsync(parameter);
-            if (executeOutput is { Length: > 0 }) m_Logger.LogInfoFormat("Output:\n{0}0", string.Join('\n', executeOutput));
+            if (executeOutput is { Length: > 0 }) m_Logger.LogInfoFormat("Output: {\n{0} \n}", string.Join('\n', executeOutput));
         }
         catch (Exception e)
         {
