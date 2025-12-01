@@ -5,5 +5,7 @@ namespace Lua.Scripting.Abstraction;
 
 public interface ILuaScriptUnloader
 {
-    ValueTask UnloadAsync(string name, CancellationToken cancellationToken = default);
+    ValueTask UnloadByNameAsync(string name, CancellationToken cancellationToken = default);
+
+    ValueTask UnloadBySourceAsync(string source, CancellationToken cancellationToken = default);
 }

@@ -22,12 +22,6 @@ internal sealed class LuaScript(LuaState state, LuaClosure closure, LuaTable env
         return m_State.ExecuteAsync(m_Closure, cancellationToken);
     }
 
-    public ValueTask<LuaValue[]> ReloadAsync(CancellationToken cancellationToken = default)
-    {
-        Clear();
-        return ExecuteAsync(cancellationToken);
-    }
-
     public bool TryGetValue(LuaValue name, out LuaValue value) => m_Environment.TryGetValue(name, out value) && value.Type is not LuaValueType.Nil;
 
     public LuaValue GetValue(LuaValue name) => m_Environment[name];

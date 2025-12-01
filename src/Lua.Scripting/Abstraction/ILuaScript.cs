@@ -23,6 +23,4 @@ public interface ILuaScript : ILuaStringExecutor, ILuaValueCaller
     void RemoveValue(LuaValue name);
 
     void Clear();
-
-    ValueTask<LuaValue[]> ReloadAsync(CancellationToken cancellationToken = default);
 }

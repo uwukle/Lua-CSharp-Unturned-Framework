@@ -7,5 +7,5 @@ public interface ILuaScriptLoader
 {
     ValueTask<ILuaScript> LoadAsync(string code, string name, CancellationToken cancellationToken = default);
 
-    ValueTask<ILuaScript> LoadFromAsync(string path, CancellationToken cancellationToken = default);
+    ValueTask<ILuaScript> LoadFromAsync(string path, string name, CancellationToken cancellationToken = default);
 }

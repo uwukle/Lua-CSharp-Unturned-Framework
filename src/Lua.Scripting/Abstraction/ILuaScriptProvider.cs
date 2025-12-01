@@ -7,7 +7,9 @@ public interface ILuaScriptProvider : ILuaScriptLoader, ILuaScriptUnloader, IAsy
 {
     IEnumerable<ILuaScript> Scripts { get; }
 
-    bool Has(string name);
+    bool HasByName(string name);
 
-    ILuaScript? Get(string name);
+    ILuaScript? GetByName(string name);
+
+    ILuaScript? GetBySource(string source);
 }
