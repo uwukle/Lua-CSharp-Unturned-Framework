@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Lua.Scripting.Abstraction;
 
@@ -12,4 +14,6 @@ public interface ILuaScriptProvider : ILuaScriptLoader, ILuaScriptUnloader, IAsy
     ILuaScript? GetByName(string name);
 
     ILuaScript? GetBySource(string source);
+
+    ValueTask DisposeAsync(CancellationToken cancellationToken = default);
 }
