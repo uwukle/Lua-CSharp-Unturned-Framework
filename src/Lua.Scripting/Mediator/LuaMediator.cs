@@ -13,7 +13,7 @@ public sealed class LuaMediator(ILuaScriptProvider provider) : ILuaMediator
 
     public ValueTask NotifyAsync(string callback, ReadOnlySpan<LuaValue> notificationArguments, CancellationToken cancellationToken = default)
     {
-        var pooled = new PooledArray<LuaValue>(notificationArguments.Length);
+        using var pooled = new PooledArray<LuaValue>(notificationArguments.Length);
         notificationArguments.CopyTo(pooled.AsSpan());
         return InternalNotifyAsync(callback, pooled.AsMemory(), cancellationToken);
     }
