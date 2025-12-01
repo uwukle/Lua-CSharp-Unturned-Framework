@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<ItemGroup>
+		<ProjectReference Include="..\Lua.Plugins\Lua.Plugins.csproj" />
 		<ProjectReference Include="..\Lua.Unturned\Lua.Unturned.csproj" />
 	</ItemGroup>
 	

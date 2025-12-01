@@ -9,10 +9,10 @@ public sealed partial class LuaScriptMetaData(string name, string source, LuaScr
     public enum ECreationFlags : byte
     {
         None = 0,
-        CSharp = 1,
-        Script = 2,
-        Memory = 4,
-        File = 8
+        Memory = 1,
+        File = 2,
+        CSharp = 4,
+        Script = 8,
     }
 
     [LuaMember]

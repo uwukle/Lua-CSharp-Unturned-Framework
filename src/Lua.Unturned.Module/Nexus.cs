@@ -1,4 +1,5 @@
-﻿using Lua.Scripting;
+﻿using Lua.Plugins;
+using Lua.Scripting;
 using Lua.Scripting.Abstraction;
 using Lua.Scripting.Extensions;
 using Lua.Scripting.Logging.Abstraction;
@@ -59,26 +60,34 @@ public sealed class Nexus : IModuleNexus
     }
 
     private const string LUA_STARTUP_DIRECTORY = "Startup";
+    private const string LUA_PLUGINS_DIRECTORY = "Plugins";
 
     private static Nexus? m_Instance;
+
     private readonly CancellationTokenSource m_CancellationTokenSource;
-    private readonly LuaScriptProvider m_Provider;
+
+    private readonly LuaScriptProvider m_ScriptProvider;
     private readonly LuaMediator m_Mediator;
     private readonly LuaUnturnedLogger m_Logger;
+    private readonly LuaPluginProvider m_PluginProvider;
+
     private readonly DirectoryBinder m_DirectoryBinder;
 
     public Nexus()
     {
-        m_Provider = new(LuaUnturnedPlatform.Default);
-        m_Logger = new();
         m_CancellationTokenSource = new();
-        m_Mediator = new(m_Logger, m_Provider);
+
+        m_ScriptProvider = new(LuaUnturnedPlatform.Default);
+        m_Logger = new();
+        m_Mediator = new(m_Logger, m_ScriptProvider);
+        m_PluginProvider = new(m_ScriptProvider, m_ScriptProvider, m_Logger, m_Mediator);
+
         m_DirectoryBinder = new(Path.Combine("Servers", Dedicator.serverID, "Lua"));
     }
 
     public static Nexus Instance => m_Instance ?? throw new NullReferenceException($"Not a single instance of the {nameof(Nexus)} was ever initialized.");
 
-    public ILuaScriptProvider Provider => m_Provider;
+    public ILuaScriptProvider ScriptProvider => m_ScriptProvider;
 
     public ILuaMediator Mediator => m_Mediator;
 
@@ -92,7 +101,7 @@ public sealed class Nexus : IModuleNexus
 
         m_DirectoryBinder.Bind();
 
-        Task.Run(() => LoadDefaultScriptsAsync(m_CancellationTokenSource.Token));
+        Task.Run(() => LoadNexusAsync(m_CancellationTokenSource.Token));
     }
 
     void IModuleNexus.shutdown()
@@ -103,13 +112,20 @@ public sealed class Nexus : IModuleNexus
         m_DirectoryBinder.Dispose();
 
         m_CancellationTokenSource.Cancel();
-        Task.Run(m_Provider.DisposeAsync);
+        Task.Run(m_ScriptProvider.DisposeAsync);
+    }
+
+    private async Task LoadNexusAsync(CancellationToken cancellationToken = default)
+    {
+        await LoadPluginsAsync(cancellationToken);
+        await LoadDefaultScriptsAsync(cancellationToken);
+        await m_Mediator.OnNexusLoadedAsync(cancellationToken);
     }
 
     private async Task LoadDefaultScriptsAsync(CancellationToken cancellationToken = default)
     {
         var logger = m_Logger;
-        var provider = m_Provider;
+        var provider = m_ScriptProvider;
         var mediator = m_Mediator;
 
         Directory.CreateDirectoryIfNeeded(LUA_STARTUP_DIRECTORY);
@@ -134,7 +150,28 @@ public sealed class Nexus : IModuleNexus
                 logger.LogFatalFormat("An unexpected error occurred while loading the Lua script {0}.", e, scriptPath);
             }
         }
+    }
 
-        await mediator.OnNexusLoadedAsync(cancellationToken);
+    private async Task LoadPluginsAsync(CancellationToken cancellationToken = default)
+    {
+        var logger = m_Logger;
+        var provider = m_PluginProvider;
+
+        Directory.CreateDirectoryIfNeeded(LUA_PLUGINS_DIRECTORY);
+
+        foreach (var pluginPath in Directory.GetFiles(LUA_PLUGINS_DIRECTORY, "*.dll", SearchOption.TopDirectoryOnly))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            try
+            {
+                await provider.LoadFromAsync(pluginPath, cancellationToken);
+                logger.LogInfoFormat("Plugins dll {0} loaded successfully.", pluginPath);
+            }
+            catch (Exception e)
+            {
+                logger.LogFatalFormat("An unexpected error occurred while loading the plugins dll {0}.", e, pluginPath);
+            }
+        }
     }
 }

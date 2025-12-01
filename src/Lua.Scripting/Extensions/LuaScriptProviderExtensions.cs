@@ -21,7 +21,7 @@ public static class LuaScriptProviderExtensions
         {
             var f when (f & LuaScriptMetaData.ECreationFlags.Memory) is not 0 => provider.LoadAsync(source, name, cancellationToken),
             var f when (f & LuaScriptMetaData.ECreationFlags.File) is not 0 => provider.LoadFromAsync(source, cancellationToken),
-            _ => throw new InvalidOperationException($"Reloading a script of unknown origin \"{source}\"({flags}) is not possible."),
+            _ => throw new InvalidOperationException($"Reloading a script of unknown source \"{source}\"({flags}) is not possible."),
         };
     }
 

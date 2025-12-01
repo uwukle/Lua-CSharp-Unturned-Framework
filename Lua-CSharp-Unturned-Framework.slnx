@@ -2,6 +2,7 @@
   <Folder Name="/src/">
     <File Path="src/Directory.Build.props" />
     <File Path="src/Directory.Packages.props" />
+    <Project Path="src/Lua.Plugins/Lua.Plugins.csproj" />
     <Project Path="src/Lua.Scripting/Lua.Scripting.csproj" Id="fd50f4d0-1b82-4f46-8042-80a7baa4385e" />
     <Project Path="src/Lua.Unity/Lua.Unity.csproj" />
     <Project Path="src/Lua.Unturned.Module.Standalone/Lua.Unturned.Module.Standalone.csproj" />
