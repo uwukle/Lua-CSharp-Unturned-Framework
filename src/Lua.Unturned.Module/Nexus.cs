@@ -1,4 +1,5 @@
 ﻿using Lua.Plugins;
+using Lua.Plugins.Extensions;
 using Lua.Scripting;
 using Lua.Scripting.Abstraction;
 using Lua.Scripting.Extensions;
