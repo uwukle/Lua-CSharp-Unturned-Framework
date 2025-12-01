@@ -3,6 +3,7 @@ using Lua.Scripting.Logging.Abstraction;
 using Lua.Scripting.Logging.Extensions;
 using SDG.Unturned;
 using Steamworks;
+using System;
 using System.Threading.Tasks;
 
 namespace Lua.Unturned.Module.Commands;
@@ -28,8 +29,18 @@ public sealed class LuaRunCommand : Command
 
     private async Task RunScriptAsync(CSteamID executorId, string parameter)
     {
-        var executeOutput = await m_Executer.ExecuteAsync(parameter);
-        m_Logger.LogInfoFormat("{0} execute script {1}", executorId.m_SteamID, parameter);
-        if (executeOutput is { Length: > 0 }) m_Logger.LogInfoFormat("Output:\n{0}0", string.Join('\n', executeOutput));
+        var logger = m_Logger;
+
+        logger.LogInfoFormat("{0} execute script {1}", executorId.m_SteamID, parameter);
+
+        try
+        {
+            var executeOutput = await m_Executer.ExecuteAsync(parameter);
+            if (executeOutput is { Length: > 0 }) m_Logger.LogInfoFormat("Output:\n{0}0", string.Join('\n', executeOutput));
+        }
+        catch (Exception e)
+        {
+            logger.LogFatal(e);
+        }
     }
 }
