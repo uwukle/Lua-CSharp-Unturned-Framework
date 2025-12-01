@@ -4,6 +4,7 @@ using Lua.Scripting.Logging.Abstraction;
 using Lua.Scripting.Mediator.Abstraction;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -63,16 +64,27 @@ public abstract class LuaPlugin : ILuaPlugin, ILuaInjectable
         foreach (var requiredScript in requiredScripts)
         {
             requiredScript.Deconstruct(out var flags, out var name, out var source);
-
-            ILuaScript script = flags switch
+            ILuaScript script;
+            switch (flags)
             {
-                var f when f.HasFlag(LuaRequiredScript.EFlags.LoadFromSourceCode) => await scriptProvider.LoadAsync(source, name, cancellationToken),
-                var f when f.HasFlag(LuaRequiredScript.EFlags.LoadFromFile) => await scriptProvider.LoadFromAsync(source, name, cancellationToken),
-                _ => throw new InvalidOperationException($"Load a script of unknown source \"{source}\"({flags}) is not possible."),
-            };
+                case var f when f.HasFlag(LuaRequiredScript.EFlags.LoadFromSourceCode):
+                    script = await scriptProvider.LoadAsync(source, name, cancellationToken);
+                    break;
+                case var f when f.HasFlag(LuaRequiredScript.EFlags.LoadFromFile):
+                    if (!File.Exists(source))
+                    {
+                        if (f.HasFlag(LuaRequiredScript.EFlags.ThrowIfNotFound)) throw new FileNotFoundException("Required script source not found.", source);
+                        continue;
+                    }
+
+                    script = await scriptProvider.LoadFromAsync(source, name, cancellationToken);
+                    break;
+                default:
+                    throw new InvalidOperationException($"Load a script of unknown source \"{source}\"({flags}) is not possible.");
+            }
 
             if (flags.HasFlag(LuaRequiredScript.EFlags.ExecuteOnLoad)) await script.ExecuteAsync(cancellationToken);
-        }     
+        }
     }
 
     private async Task UnloadRequiredScripts(CancellationToken cancellationToken = default)
@@ -99,13 +111,19 @@ public abstract class LuaPlugin : ILuaPlugin, ILuaInjectable
         foreach (var loader in loaders) moduleLoaderProvider.Unregister(loader);
     }
 
-    public static LuaRequiredScript RequiredSource(string name, string code, bool executeOnLoad = true) => Required(name, code, LuaRequiredScript.EFlags.LoadFromFile, executeOnLoad);
+    public static LuaRequiredScript RequiredSource(string name, string code, bool executeOnLoad = true, bool throwIfNotFound = false) => Required(name, code, LuaRequiredScript.EFlags.LoadFromFile, executeOnLoad, throwIfNotFound);
 
-    public static LuaRequiredScript RequiredFile(string name, string path, bool executeOnLoad = true) => Required(name, path, LuaRequiredScript.EFlags.LoadFromFile, executeOnLoad);
+    public static LuaRequiredScript RequiredFile(string name, string path, bool executeOnLoad = true, bool throwIfNotFound = false) => Required(name, path, LuaRequiredScript.EFlags.LoadFromFile, executeOnLoad, throwIfNotFound);
 
-    public static LuaRequiredScript Required(string name, string source, LuaRequiredScript.EFlags baseFlags, bool executeOnLoad = true) => Required(name, source, GetRequiredFlags(baseFlags, executeOnLoad));
+    public static LuaRequiredScript Required(string name, string source, LuaRequiredScript.EFlags baseFlags, bool executeOnLoad = true, bool throwIfNotFound = false) => Required(name, source, GetRequiredFlags(baseFlags, executeOnLoad, throwIfNotFound));
 
     public static LuaRequiredScript Required(string name, string source, LuaRequiredScript.EFlags flags) => new(flags, name, source);
 
-    private static LuaRequiredScript.EFlags GetRequiredFlags(LuaRequiredScript.EFlags baseFlags, bool executeOnLoad) => executeOnLoad ? baseFlags | LuaRequiredScript.EFlags.ExecuteOnLoad : baseFlags;
+    private static LuaRequiredScript.EFlags GetRequiredFlags(LuaRequiredScript.EFlags baseFlags, bool executeOnLoad, bool throwIfNotFound)
+    {
+        if (executeOnLoad) baseFlags |= LuaRequiredScript.EFlags.ExecuteOnLoad;
+        if (throwIfNotFound) baseFlags |= LuaRequiredScript.EFlags.ThrowIfNotFound;
+
+        return baseFlags;
+    }
 }

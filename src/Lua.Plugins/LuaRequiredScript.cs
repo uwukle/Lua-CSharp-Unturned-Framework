@@ -11,5 +11,6 @@ public readonly record struct LuaRequiredScript(LuaRequiredScript.EFlags Flags, 
         ExecuteOnLoad = 1,
         LoadFromSourceCode = 2,
         LoadFromFile = 4,
+        ThrowIfNotFound = 8
     }
 }

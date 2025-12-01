@@ -2,6 +2,7 @@
 using Lua.Plugins.Tools;
 using Lua.Scripting.Abstraction;
 using Lua.Scripting.Logging.Abstraction;
+using Lua.Scripting.Logging.Extensions;
 using Lua.Scripting.Mediator.Abstraction;
 using System;
 using System.Collections.Generic;
@@ -42,9 +43,17 @@ public sealed class LuaPluginProvider(ILuaScriptProvider scriptProvider, ILuaMod
         foreach (var type in types)
         {
             if (!LuaPluginTool.IsPluginType(type)) continue;
-            var plugin = LuaPluginTool.Create(type, scriptProvider, moduleLoaderProvider, logger, mediator);
-            await plugin.LoadAsync(cancellationToken);
-            plugins.Add(plugin);
+
+            try
+            {
+                var plugin = LuaPluginTool.Create(type, scriptProvider, moduleLoaderProvider, logger, mediator);
+                await plugin.LoadAsync(cancellationToken);
+                plugins.Add(plugin);
+            }
+            catch (Exception e)
+            {
+                logger.LogFatalFormat("An unhandled exception occurred while loading the plugin {0}\\{1}.", e, path, type.FullName);
+            }
         }
     }
 
