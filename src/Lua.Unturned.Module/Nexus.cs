@@ -10,6 +10,7 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Lua.Unturned.Module.Extensions;
 
 namespace Lua.Unturned.Module;
 
@@ -40,8 +41,10 @@ public class Nexus : IModuleNexus
         private bool SetDirectory(string? path)
         {
             if (string.IsNullOrEmpty(path)) return false;
-            if (!Directory.Exists(path)) Directory.CreateDirectory(path);
+
+            Directory.CreateDirectoryIfNeeded(path);
             Directory.SetCurrentDirectory(path);
+
             return true;
         }
     }
@@ -93,6 +96,8 @@ public class Nexus : IModuleNexus
     {
         var logger = m_Logger;
         var provider = m_Provider;
+
+        Directory.CreateDirectoryIfNeeded(LUA_STARTUP_DIRECTORY);
 
         foreach (var scriptPath in Directory.GetFiles(LUA_STARTUP_DIRECTORY, "*.lua", SearchOption.TopDirectoryOnly))
         {
