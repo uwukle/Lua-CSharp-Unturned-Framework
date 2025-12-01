@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Lua.Scripting.Abstraction;
 
-public interface ILuaScript : ILuaStringExecutor, ILuaValueCaller
+public interface ILuaScript : ILuaStringExecutor, ILuaValueCaller, ILuaUserData
 {
     string Name { get; }
 

@@ -1,21 +1,21 @@
 ﻿using Lua.Scripting;
 using Lua.Scripting.Abstraction;
 using Lua.Scripting.Extensions;
+using Lua.Scripting.Logging.Abstraction;
 using Lua.Scripting.Logging.Extensions;
 using Lua.Scripting.Mediator;
 using Lua.Scripting.Mediator.Abstraction;
+using Lua.Unturned.Module.Extensions;
 using SDG.Framework.Modules;
 using SDG.Unturned;
 using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Lua.Unturned.Module.Extensions;
-using Lua.Scripting.Logging.Abstraction;
 
 namespace Lua.Unturned.Module;
 
-public class Nexus : IModuleNexus
+public sealed class Nexus : IModuleNexus
 {
     private sealed class DirectoryBinder(string bindDirectory) : IDisposable
     {
@@ -107,6 +107,7 @@ public class Nexus : IModuleNexus
     {
         var logger = m_Logger;
         var provider = m_Provider;
+        var mediator = m_Mediator;
 
         Directory.CreateDirectoryIfNeeded(LUA_STARTUP_DIRECTORY);
 
@@ -115,15 +116,19 @@ public class Nexus : IModuleNexus
             try
             {
                 var script = await provider.LoadFromAsync(scriptPath, cancellationToken);
-                var loadResult = await script.ExecuteAsync();
+                var loadOutput = await script.ExecuteAsync();
 
                 logger.LogInfoFormat("Lua script {0} loaded successfully.", scriptPath);
-                logger.LogInfoFormat("Lua script {0} Output:\n{1}", scriptPath, string.Join("\n", loadResult));
+                logger.LogInfoFormat("Lua script {0} Output:\n{1}", scriptPath, string.Join("\n", loadOutput));
+
+                await mediator.OnScriptLoadedAsync(script, loadOutput, cancellationToken);
             }
             catch (Exception e)
             {
                 logger.LogFatalFormat("An unexpected error occurred while loading the Lua script {0}.", e, scriptPath);
             }
         }
+
+        await mediator.OnNexusLoadedAsync(cancellationToken);
     }
 }
