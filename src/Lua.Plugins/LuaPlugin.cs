@@ -1,15 +1,12 @@
 ﻿using Lua.Plugins.Abstraction;
 using Lua.Plugins.Extensions;
 using Lua.Scripting.Abstraction;
-using Lua.Scripting.Extensions;
 using Lua.Scripting.Logging.Abstraction;
 using Lua.Scripting.Mediator.Abstraction;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace Lua.Plugins;
 

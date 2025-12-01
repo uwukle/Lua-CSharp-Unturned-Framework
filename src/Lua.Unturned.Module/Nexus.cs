@@ -2,7 +2,6 @@
 using Lua.Plugins.Extensions;
 using Lua.Scripting;
 using Lua.Scripting.Abstraction;
-using Lua.Scripting.Extensions;
 using Lua.Scripting.Logging.Abstraction;
 using Lua.Scripting.Logging.Extensions;
 using Lua.Scripting.Mediator;

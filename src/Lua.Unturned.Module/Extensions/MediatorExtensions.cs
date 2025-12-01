@@ -1,7 +1,4 @@
-﻿using Lua.Internal;
-using Lua.Scripting.Abstraction;
-using Lua.Scripting.Mediator.Abstraction;
-using System;
+﻿using Lua.Scripting.Mediator.Abstraction;
 using System.Threading;
 using System.Threading.Tasks;
 
