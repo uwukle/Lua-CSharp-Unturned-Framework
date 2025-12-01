@@ -148,7 +148,6 @@ public sealed class Nexus : IModuleNexus
                 logger.LogInfoFormat("Lua script {0} loaded successfully.", scriptPath);
                 logger.LogInfoFormat("Lua script {0} Output:\n{1}", scriptPath, string.Join("\n", loadOutput));
 
-                await mediator.OnLoadedAsync(loadOutput, cancellationToken);
                 await mediator.OnScriptLoadedAsync(script, loadOutput, cancellationToken);
             }
             catch (Exception e)

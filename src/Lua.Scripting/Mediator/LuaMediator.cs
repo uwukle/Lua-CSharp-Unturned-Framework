@@ -1,5 +1,6 @@
 ﻿using Lua.Internal;
 using Lua.Scripting.Abstraction;
+using Lua.Scripting.Extensions;
 using Lua.Scripting.Logging.Abstraction;
 using Lua.Scripting.Logging.Extensions;
 using Lua.Scripting.Mediator.Abstraction;
@@ -25,11 +26,9 @@ public sealed class LuaMediator(ILuaLogger logger, ILuaScriptProvider provider) 
     {
         foreach (var script in m_Provider.Scripts)
         {
-            if (!script.TryGetValue(callback, out var handler)) continue;
-
             try
             {
-                return script.CallValueAsync(handler, requestArguments, cancellationToken);
+                return script.CallIfCanAsync(callback, requestArguments, cancellationToken);
             }
             catch (Exception e)
             {
@@ -45,11 +44,9 @@ public sealed class LuaMediator(ILuaLogger logger, ILuaScriptProvider provider) 
     {
         foreach (var script in m_Provider.Scripts)
         {
-            if (!script.TryGetValue(callback, out var handler)) continue;
-
             try
             {
-                _ = await script.CallValueAsync(handler, notificationArguments.Span, cancellationToken);
+                _ = await script.CallIfCanAsync(callback, notificationArguments.Span, cancellationToken);
             }
             catch (Exception e)
             {
