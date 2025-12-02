@@ -22,17 +22,17 @@ public abstract class LuaPlugin : ILuaPlugin, ILuaInjectable
 
 #nullable disable
 
-    public ILuaScriptProvider ScriptProvider { get; private set; }
+    protected ILuaScriptProvider ScriptProvider { get; private set; }
 
-    public ILuaModuleLoaderProvider ModuleLoaderProvider { get; private set; }
+    protected ILuaModuleLoaderProvider ModuleLoaderProvider { get; private set; }
 
-    public ILuaLogger Logger { get; private set; }
+    protected ILuaLogger Logger { get; private set; }
 
-    public ILuaMediator Mediator { get; private set; }
+    protected ILuaMediator Mediator { get; private set; }
 
 #nullable restore
 
-    public virtual IEnumerable<ILuaModuleLoader> Loaders => [];
+    protected virtual IEnumerable<ILuaModuleLoader> Loaders => [];
 
     public async ValueTask LoadAsync(CancellationToken cancellationToken = default)
     {

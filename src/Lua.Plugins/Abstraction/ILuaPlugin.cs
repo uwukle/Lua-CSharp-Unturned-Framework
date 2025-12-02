@@ -11,16 +11,6 @@ public interface ILuaPlugin
 {
     string Name { get; }
 
-    ILuaScriptProvider ScriptProvider { get; }
-
-    ILuaModuleLoaderProvider ModuleLoaderProvider { get; }
-
-    ILuaLogger Logger { get; }
-
-    ILuaMediator Mediator { get; }
-
-    IEnumerable<ILuaModuleLoader> Loaders { get; }
-
     ValueTask LoadAsync(CancellationToken cancellationToken = default);
 
     ValueTask UnloadAsync(CancellationToken cancellationToken = default);
