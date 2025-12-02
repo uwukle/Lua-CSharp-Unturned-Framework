@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Lua.Unity;
 
-[LuaObject("Vector2")]
+[LuaObject(nameof(Vector2))]
 public sealed partial class LuaVector2(float x, float y) : ILuaNormalizable, ILuaCopiable<LuaVector2>, IEquatable<LuaVector2>, IEquatable<Vector2>
 {
     [LuaIgnoreMember]
