@@ -28,7 +28,7 @@ public sealed class LuaMediator(ILuaLogger logger, ILuaScriptProvider provider) 
         {
             try
             {
-                return script.CallIfCanAsync(callback, requestArguments, cancellationToken);
+                return script.CallValueIfCanAsync(callback, requestArguments, cancellationToken);
             }
             catch (Exception e)
             {
@@ -46,7 +46,7 @@ public sealed class LuaMediator(ILuaLogger logger, ILuaScriptProvider provider) 
         {
             try
             {
-                _ = await script.CallIfCanAsync(callback, notificationArguments.Span, cancellationToken);
+                _ = await script.CallValueIfCanAsync(callback, notificationArguments.Span, cancellationToken);
             }
             catch (Exception e)
             {

@@ -30,19 +30,19 @@ public sealed class LuaScriptProvider : ILuaScriptProvider, ILuaStringExecutor, 
 
     public ILuaScript? GetByName(string name) => m_Scripts.Find(s => s.Name == name);
 
-    public ValueTask<ILuaScript> LoadAsync(string code, string name, CancellationToken cancellationToken = default)
+    public ValueTask<ILuaScript> LoadAsync(string code, string name, LuaTable? environment = null, CancellationToken cancellationToken = default)
     {
         var state = m_State;
-        LuaTable env = [];
-        LuaScript script = new(state, state.Load(code.AsSpan(), name, env), env, new(name, code, MEMORY_SCRIPT_CREATION_FLAGS));
+        environment ??= state.Environment;
+        LuaScript script = new(state, state.Load(code.AsSpan(), name, environment), environment, new(name, code, MEMORY_SCRIPT_CREATION_FLAGS));
         return new(InternalRegisterScriptAsync(script, cancellationToken));
     }
 
-    public async ValueTask<ILuaScript> LoadFromAsync(string path, string name, CancellationToken cancellationToken = default)
+    public async ValueTask<ILuaScript> LoadFromAsync(string path, string name, LuaTable? environment = null, CancellationToken cancellationToken = default)
     {
         var state = m_State;
-        LuaTable env = [];
-        LuaScript script = new(state, await state.LoadFileAsync(path, string.Empty, env, cancellationToken), env, new(name, path, FILE_SCRIPT_CREATION_FLAGS));
+        environment ??= state.Environment;
+        LuaScript script = new(state, await state.LoadFileAsync(path, string.Empty, environment, cancellationToken), environment, new(name, path, FILE_SCRIPT_CREATION_FLAGS));
         return await InternalRegisterScriptAsync(script, cancellationToken);
     }
 
