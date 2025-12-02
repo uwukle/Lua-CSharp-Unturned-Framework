@@ -112,6 +112,8 @@ public sealed class Nexus : IModuleNexus
 
     public ILuaLogger Logger => m_Logger;
 
+    public ILuaModuleLoaderProvider ModuleLoaderProvider => m_ScriptProvider;
+
     void IModuleNexus.initialize()
     {
         if (m_Instance is not null) throw new InvalidOperationException($"It is not possible to initialize more than one {nameof(Nexus)} instance.");
