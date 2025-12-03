@@ -82,8 +82,8 @@ public sealed partial class LuaVector2(float x, float y) : ILuaNormalizable, ILu
     [LuaIgnoreMember]
     public void Set(LuaVector2 vector2) => Set(vector2.ToUnityVector2());
 
-    [LuaMember(nameof(Vector2.Scale))]
-    public void Scale(LuaVector2 vector2)
+    [LuaMember(nameof(ScaleInPlace))]
+    public void ScaleInPlace(LuaVector2 vector2)
     {
         X *= vector2.X;
         Y *= vector2.Y;
@@ -93,7 +93,7 @@ public sealed partial class LuaVector2(float x, float y) : ILuaNormalizable, ILu
     public void Normalize() => m_Source.Normalize();
 
     [LuaIgnoreMember]
-    public bool Equals(LuaVector2 other) => x == other.X && y == other.Y;
+    public bool Equals(LuaVector2 other) => X == other.X && Y == other.Y;
 
     [LuaIgnoreMember]
     public bool Equals(Vector2 other) => X == other.x && Y == other.y;
@@ -115,70 +115,70 @@ public sealed partial class LuaVector2(float x, float y) : ILuaNormalizable, ILu
     [LuaIgnoreMember]
     public override string ToString() => m_Source.ToString();
 
-    [LuaMember(nameof(AddWith))]
-    public void AddWith(LuaVector2 b) => Set(ToUnityVector2() + b.ToUnityVector2());
+    [LuaMember(nameof(AddInPlace))]
+    public void AddInPlace(LuaVector2 b) => Set(ToUnityVector2() + b.ToUnityVector2());
 
-    [LuaMember(nameof(SubWith))]
-    public void SubWith(LuaVector2 b) => Set(ToUnityVector2() + b.ToUnityVector2());
+    [LuaMember(nameof(SubtractInPlace))]
+    public void SubtractInPlace(LuaVector2 b) => Set(ToUnityVector2() - b.ToUnityVector2());
 
-    [LuaMember(nameof(MulWith))]
-    public void MulWith(LuaVector2 b) => Set(ToUnityVector2() * b.ToUnityVector2());
+    [LuaMember(nameof(MultiplyInPlace))]
+    public void MultiplyInPlace(LuaVector2 b) => Set(ToUnityVector2() * b.ToUnityVector2());
 
-    [LuaMember(nameof(DivWith))]
-    public void DivWith(LuaVector2 b) => Set(ToUnityVector2() / b.ToUnityVector2());
+    [LuaMember(nameof(DivideInPlace))]
+    public void DivideInPlace(LuaVector2 b) => Set(ToUnityVector2() / b.ToUnityVector2());
 
-    [LuaMember(nameof(UnmWith))]
-    public void UnmWith() => Set(-ToUnityVector2());
+    [LuaMember(nameof(NegateInPlace))]
+    public void NegateInPlace() => Set(-ToUnityVector2());
 
-    [LuaMember(nameof(ReflectWith))]
-    public void ReflectWith(LuaVector2 inNormal) => Set(Vector2.Reflect(ToUnityVector2(), inNormal.ToUnityVector2()));
+    [LuaMember(nameof(ReflectInPlace))]
+    public void ReflectInPlace(LuaVector2 inNormal) => Set(Vector2.Reflect(ToUnityVector2(), inNormal.ToUnityVector2()));
 
-    [LuaMember(nameof(PerpendicularWith))]
-    public void PerpendicularWith() => Set(Vector2.Perpendicular(ToUnityVector2()));
+    [LuaMember(nameof(PerpendicularInPlace))]
+    public void PerpendicularInPlace() => Set(Vector2.Perpendicular(ToUnityVector2()));
 
-    [LuaMember(nameof(ClampMagnitudeWith))]
-    public void ClampMagnitudeWith(float maxLength) => Set(Vector2.ClampMagnitude(ToUnityVector2(), maxLength));
+    [LuaMember(nameof(ClampMagnitudeInPlace))]
+    public void ClampMagnitudeInPlace(float maxLength) => Set(Vector2.ClampMagnitude(ToUnityVector2(), maxLength));
 
-    [LuaMember(nameof(MinWith))]
-    public void MinWith(LuaVector2 rhs) => Set(Vector2.Min(ToUnityVector2(), rhs.ToUnityVector2()));
+    [LuaMember(nameof(MinInPlace))]
+    public void MinInPlace(LuaVector2 rhs) => Set(Vector2.Min(ToUnityVector2(), rhs.ToUnityVector2()));
 
-    [LuaMember(nameof(MaxWith))]
-    public void MaxWith(LuaVector2 rhs) => Set(Vector2.Max(ToUnityVector2(), rhs.ToUnityVector2()));
+    [LuaMember(nameof(MaxInPlace))]
+    public void MaxInPlace(LuaVector2 rhs) => Set(Vector2.Max(ToUnityVector2(), rhs.ToUnityVector2()));
 
-    [LuaMember(nameof(SmoothDampWith))]
-    public void SmoothDampWith(LuaVector2 target, LuaVector2 currentVelocity, float smoothTime, float maxSpeed, float deltaTime)
+    [LuaMember(nameof(SmoothDampInPlace))]
+    public void SmoothDampInPlace(LuaVector2 target, LuaVector2 currentVelocity, float smoothTime, float maxSpeed, float deltaTime)
     {
         var currentVelocityUnityVector2 = currentVelocity.ToUnityVector2();
         Set(Vector2.SmoothDamp(ToUnityVector2(), target.ToUnityVector2(), ref currentVelocityUnityVector2, smoothTime, maxSpeed, deltaTime));
         currentVelocity.Set(currentVelocityUnityVector2);
     }
 
-    [LuaMember(nameof(LerpWith))]
-    public void LerpWith(LuaVector2 b, float t) => Set(Vector2.Lerp(ToUnityVector2(), b.ToUnityVector2(), t));
+    [LuaMember(nameof(LerpInPlace))]
+    public void LerpInPlace(LuaVector2 b, float t) => Set(Vector2.Lerp(ToUnityVector2(), b.ToUnityVector2(), t));
 
-    [LuaMember(nameof(LerpUnclampedWith))]
-    public void LerpUnclampedWith(LuaVector2 b, float t) => Set(Vector2.LerpUnclamped(ToUnityVector2(), b.ToUnityVector2(), t));
+    [LuaMember(nameof(LerpUnclampedInPlace))]
+    public void LerpUnclampedInPlace(LuaVector2 b, float t) => Set(Vector2.LerpUnclamped(ToUnityVector2(), b.ToUnityVector2(), t));
 
-    [LuaMember(nameof(MoveTowardsWith))]
-    public void MoveTowardsWith(LuaVector2 target, float maxDistanceDelta) => Set(Vector2.MoveTowards(ToUnityVector2(), target.ToUnityVector2(), maxDistanceDelta));
+    [LuaMember(nameof(MoveTowardsInPlace))]
+    public void MoveTowardsInPlace(LuaVector2 target, float maxDistanceDelta) => Set(Vector2.MoveTowards(ToUnityVector2(), target.ToUnityVector2(), maxDistanceDelta));
 
     [LuaMetamethod(LuaObjectMetamethod.Add)]
-    public LuaVector2 Add(LuaVector2 a, LuaVector2 b) => new(a.ToUnityVector2() + b.ToUnityVector2());
+    public static LuaVector2 Add(LuaVector2 a, LuaVector2 b) => new(a.ToUnityVector2() + b.ToUnityVector2());
 
     [LuaMetamethod(LuaObjectMetamethod.Sub)]
-    public static LuaVector2 Sub(LuaVector2 a, LuaVector2 b) => new(a.ToUnityVector2() + b.ToUnityVector2());
+    public static LuaVector2 Subtract(LuaVector2 a, LuaVector2 b) => new(a.ToUnityVector2() - b.ToUnityVector2());
 
     [LuaMetamethod(LuaObjectMetamethod.Mul)]
-    public static LuaVector2 Mul(LuaVector2 a, LuaVector2 b) => new(a.ToUnityVector2() * b.ToUnityVector2());
+    public static LuaVector2 Multiply(LuaVector2 a, LuaVector2 b) => new(a.ToUnityVector2() * b.ToUnityVector2());
 
     [LuaMetamethod(LuaObjectMetamethod.Div)]
-    public static LuaVector2 Div(LuaVector2 a, LuaVector2 b) => new(a.ToUnityVector2() / b.ToUnityVector2());
+    public static LuaVector2 Divide(LuaVector2 a, LuaVector2 b) => new(a.ToUnityVector2() / b.ToUnityVector2());
 
     [LuaMetamethod(LuaObjectMetamethod.Unm)]
-    public static LuaVector2 Unm(LuaVector2 a) => new(-a.ToUnityVector2());
+    public static LuaVector2 Negate(LuaVector2 a) => new(-a.ToUnityVector2());
 
     [LuaMetamethod(LuaObjectMetamethod.Eq)]
-    public static bool Eq(LuaVector2 lhs, LuaVector2 rhs) => lhs.ToUnityVector2() == rhs.ToUnityVector2();
+    public static bool Equals(LuaVector2 lhs, LuaVector2 rhs) => lhs.ToUnityVector2() == rhs.ToUnityVector2();
 
     [LuaMember(nameof(Vector2.Reflect))]
     public static LuaVector2 Reflect(LuaVector2 inDirection, LuaVector2 inNormal) => new(Vector2.Reflect(inDirection.ToUnityVector2(), inNormal.ToUnityVector2()));
@@ -196,7 +196,7 @@ public sealed partial class LuaVector2(float x, float y) : ILuaNormalizable, ILu
     public static float SignedAngle(LuaVector2 from, LuaVector2 to) => Vector2.SignedAngle(from.ToUnityVector2(), to.ToUnityVector2());
 
     [LuaMember(nameof(Vector2.Distance))]
-    public static float Distance(LuaVector2 a, LuaVector2 b) => Vector2.SignedAngle(a.ToUnityVector2(), b.ToUnityVector2());
+    public static float Distance(LuaVector2 a, LuaVector2 b) => Vector2.Distance(a.ToUnityVector2(), b.ToUnityVector2());
 
     [LuaMember(nameof(Vector2.ClampMagnitude))]
     public static LuaVector2 ClampMagnitude(LuaVector2 vector, float maxLength) => new(Vector2.ClampMagnitude(vector.ToUnityVector2(), maxLength));
