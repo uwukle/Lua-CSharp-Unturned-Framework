@@ -21,6 +21,8 @@ public sealed partial class LuaVector2(float x, float y) : ILuaNormalizable, ILu
 
     public LuaVector2(LuaVector2 vector2) : this(vector2.X, vector2.Y) { }
 
+    public LuaVector2(LuaVector3 vector3) : this(vector3.X, vector3.Y) { }
+
     public LuaVector2() : this(0.0f, 0.0f) { }
 
     [LuaMember(nameof(Vector2.zero))]
@@ -224,6 +226,9 @@ public sealed partial class LuaVector2(float x, float y) : ILuaNormalizable, ILu
 
     [LuaMember(nameof(Vector2.MoveTowards))]
     public static LuaVector2 MoveTowards(LuaVector2 current, LuaVector2 target, float maxDistanceDelta) => new(Vector2.MoveTowards(current.ToUnityVector2(), target.ToUnityVector2(), maxDistanceDelta));
+
+    [LuaMember(nameof(ToVector3))]
+    public LuaVector3 ToVector3() => new(this);
 
     [LuaIgnoreMember]
     public Vector2 ToUnityVector2() => new(X, Y);
