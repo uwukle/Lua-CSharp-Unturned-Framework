@@ -201,10 +201,10 @@ public sealed partial class LuaVector4(float x, float y, float z, float w) : ILu
     public static float SqrMagnitudeStatic(LuaVector4 vector) => vector.SqrMagnitude;
 
     [LuaMember(nameof(GetHomogeneousPoint))]
-    public LuaVector3 GetHomogeneousPoint() => Mathf.Approximately(W, 0.0f) ? new LuaVector3(X, Y, Z) : new LuaVector3(X / W, Y / W, Z / W);
+    public LuaVector3 GetHomogeneousPoint() => Mathf.Approximately(W, 0.0f) ? new(X, Y, Z) : new(X / W, Y / W, Z / W);
 
     [LuaMember(nameof(GetHomogeneousVector))]
-    public LuaVector3 GetHomogeneousVector() => new LuaVector3(X, Y, Z);
+    public LuaVector3 GetHomogeneousVector() => new(X, Y, Z);
 
     [LuaIgnoreMember]
     public Vector4 ToUnityVector4() => new(X, Y, Z, W);
