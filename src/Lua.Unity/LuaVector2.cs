@@ -230,6 +230,9 @@ public sealed partial class LuaVector2(float x, float y) : ILuaNormalizable, ILu
     [LuaMember(nameof(ToVector3))]
     public LuaVector3 ToVector3() => new(this);
 
+    [LuaMember(nameof(ToVector4))]
+    public LuaVector4 ToVector4() => new(this);
+
     [LuaIgnoreMember]
     public Vector2 ToUnityVector2() => new(X, Y);
 
